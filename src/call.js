@@ -4,17 +4,28 @@
  * 传入参数执行fn
  * 删除上下文的fn，恢复原状
  * 返回fn的执行结果
- * @param {} context 
- * @param  {...any} args 
+ * @param {} context
+ * @param  {...any} args
  */
-const bind = function(context) {
+const call = function(context) {
+  if (typeof this !== 'function') {
+    throw new TypeError('Not [function] type');
+  }
+
+  // 绑定到上下文
   context = context ? Object(context) : window;
   context.fn = this;
 
-  let args = Array.prototype.slice.call(arguments, 1);
-  let r = eval('context.fn(' + args.join(',') + ')');
+  // 提取参数
+  let args = [...arguments].slice(1);
+
+  // 执行
+  let r = context.fn(...args);
+
+  // 恢复上下文
   delete context.fn;
+
   return r;
 };
 
-Function.prototype.bind = bind;
+Function.prototype.call = call;
